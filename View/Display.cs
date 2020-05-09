@@ -91,7 +91,7 @@ namespace EasySave.View
                 
                 case "-save":
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Task" + " " + name + " " + " successfully saved");
+                    Console.WriteLine("Task" + " " + name + " " + " successfully launched");
                     Console.ResetColor();
                     break;
             }
