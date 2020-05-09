@@ -113,7 +113,7 @@ namespace EasySave.Model
             });
           
 
-            TextWriter tsw = new StreamWriter(ConfigurationSettings.AppSettings["DailyLog"] + "\\"+todayString + ".json", true);
+            TextWriter tsw = new StreamWriter(ConfigurationSettings.AppSettings["LogFolder"] + "\\"+todayString + ".json", true);
             string json = JsonConvert.SerializeObject(data, Formatting.Indented);
             tsw.WriteLine(json);
             tsw.Close();

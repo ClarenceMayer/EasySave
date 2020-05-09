@@ -24,7 +24,7 @@ namespace EasySave.Model
             target_folder = _target_folder;
             first_save = true;
             m_realTimeMonitoring = new RealTimeMonitoring(name);
-            m_realTimeMonitoring.SetPaths(source_folder, target_folder);
+            m_realTimeMonitoring.SetPaths(source_folder);
             controller = c;
         }
 
@@ -113,7 +113,7 @@ namespace EasySave.Model
                 if (!Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
-                        lock (controller)
+                        lock (controller.bigFileLock)
                         {
                             Save(fi, target_path);
                         }
@@ -146,7 +146,7 @@ namespace EasySave.Model
                 if (Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
-                        lock (controller)
+                        lock (controller.bigFileLock)
                         {
                             Save(fi, target_path);
                         }
@@ -186,7 +186,7 @@ namespace EasySave.Model
                 if (!Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
-                        lock (controller)
+                        lock (controller.bigFileLock)
                         {
                             SaveInc(fi, target_path,dirComplete);
                         }
@@ -223,7 +223,7 @@ namespace EasySave.Model
                 if (Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
-                        lock (controller)
+                        lock (controller.bigFileLock)
                         {
                             SaveInc(fi, target_path, dirComplete);
                         }

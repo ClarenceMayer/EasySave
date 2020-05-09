@@ -18,6 +18,9 @@ namespace EasySave.Controller
         IDisplay display = new Display();
         Thread frameThread;
 
+        object m_bigFileLock;
+        object IMainController.bigFileLock { get => 0; set => m_bigFileLock = value; }
+
         public delegate void DELEG();
 
         string[] m_blacklisted_apps = Utils.getBlacklist();

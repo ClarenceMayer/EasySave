@@ -1,4 +1,5 @@
 ﻿using EasySave.Controller;
+using EasySave.Controller;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -29,7 +30,7 @@ namespace EasySave.Model
             source_folder = _source_folder;
             target_folder = _target_folder;
             m_realTimeMonitoring = new RealTimeMonitoring(name);
-            m_realTimeMonitoring.SetPaths(source_folder, target_folder);
+            m_realTimeMonitoring.SetPaths(source_folder);
             controller = c;
         }
 
@@ -85,7 +86,7 @@ namespace EasySave.Model
                 if (!Utils.IsPriority(fi.Extension))
                 {
                     if(fi.Length> Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
-                        lock (controller)
+                        lock (controller.bigFileLock)
                         {
                             Save(fi, target_path);
                         }
@@ -122,7 +123,7 @@ namespace EasySave.Model
                 if (Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
-                        lock (controller)
+                        lock (controller.bigFileLock) ;
                         {
                             Save(fi, target_path);
                         }

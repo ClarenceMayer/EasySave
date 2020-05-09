@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
+using System.Configuration;
 
 namespace EasySave.Model
 
@@ -26,12 +27,11 @@ namespace EasySave.Model
             
         }
 
-        public void SetPaths(string path_directory, string _write_path)
+        public void SetPaths(string path_directory)
         {
             path_dir_to_backup = new DirectoryInfo(path_directory);
             nbr_eligible_files = updateNbrEligibleFiles();
             total_size_files_to_backup = updateSizeFilesToBackup();
-            write_path = _write_path;
         }
 
         private DirectoryInfo path_dir_to_backup;
@@ -42,7 +42,6 @@ namespace EasySave.Model
         private int nbr_files_left;
         private long size_files_left;
         private string backing_up_file;
-        private string write_path;
         private string name;
 
         public void GenerateLog(int current_file_number)
@@ -84,7 +83,7 @@ namespace EasySave.Model
                 left_files_size = adaptFileSize(size_files_left),
                 current_backup_file = backing_up_file
             }) ;
-            using (StreamWriter file = File.CreateText(write_path + "\\realtime_log_"+name+".json"))
+            using (StreamWriter file = File.CreateText(ConfigurationSettings.AppSettings["LogFolder"] + "\\realtime_log_"+name+".json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, _data);

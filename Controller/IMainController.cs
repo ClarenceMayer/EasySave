@@ -13,6 +13,7 @@ namespace EasySave.Controller
         List<IBackup> backup { get; set; }
         View.View View { get; set; }
         string[] blacklisted_apps { get; set; }
+        object bigFileLock { get; set; }
 
         string Add_save(string name, string source_folder, string target_folder, string backuptype);
         IBackup Last_backup();

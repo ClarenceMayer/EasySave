@@ -1,0 +1,16 @@
+E:\projet\C#\EasySave\obj\Debug\EasySave.csprojAssemblyReference.cache
+E:\projet\C#\EasySave\obj\Debug\View\View.g.cs
+E:\projet\C#\EasySave\obj\Debug\EasySave_MarkupCompile.cache
+E:\projet\C#\EasySave\obj\Debug\EasySave_MarkupCompile.lref
+E:\projet\C#\EasySave\bin\Debug\App.config
+E:\projet\C#\EasySave\bin\Debug\EasySave.exe.config
+E:\projet\C#\EasySave\bin\Debug\EasySave.exe
+E:\projet\C#\EasySave\bin\Debug\EasySave.pdb
+E:\projet\C#\EasySave\bin\Debug\Newtonsoft.Json.dll
+E:\projet\C#\EasySave\bin\Debug\Newtonsoft.Json.xml
+E:\projet\C#\EasySave\obj\Debug\View\View.baml
+E:\projet\C#\EasySave\obj\Debug\EasySave.g.resources
+E:\projet\C#\EasySave\obj\Debug\EasySave.csproj.CoreCompileInputs.cache
+E:\projet\C#\EasySave\obj\Debug\EasySave.csproj.CopyComplete
+E:\projet\C#\EasySave\obj\Debug\EasySave.exe
+E:\projet\C#\EasySave\obj\Debug\EasySave.pdb
