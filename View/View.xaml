@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="EasySave.View.View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasySave.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="800">
+    <Grid Margin="2,4,-2,-4">
+        <Label x:Name="source_path" Content="Source folder path:" Height="28" HorizontalAlignment="Left" Margin="25,162,0,0"  VerticalAlignment="Top" Width="148" />
+        <TextBox Height="22" HorizontalAlignment="Left" Margin="178,162,0,0" Name="sourcefolder" VerticalAlignment="Top" Width="295" />
+
+        <Label x:Name="EASY_SAVE" Content="EASY SAVE" HorizontalAlignment="Left" Height="84" Margin="178,34,0,0" VerticalAlignment="Top" Width="272" FontFamily="Segoe UI Black" FontSize="48"/>
+
+        <Label x:Name="target_path" Content="Target folder path:" Height="28" HorizontalAlignment="Left" Margin="25,201,0,0" VerticalAlignment="Top" Width="148" />
+        <TextBox Height="24" HorizontalAlignment="Left" Margin="178,202,0,0" x:Name="targetfolder" VerticalAlignment="Top" Width="295" />
+
+        <Button x:Name="add_save" Content="Add Save" HorizontalAlignment="Left" Height="32" Margin="178,253,0,0" VerticalAlignment="Top" Width="119" Click="Add_save" RenderTransformOrigin="0.662,-0.156"/>
+        <RadioButton x:Name="mirror_button" Content="Mirror Backup" HorizontalAlignment="Left" Margin="25,251,0,0" VerticalAlignment="Top" Height="14" />
+        <RadioButton x:Name="diff_button" Content="Differential Backup" HorizontalAlignment="Left" Margin="25,271,0,0" VerticalAlignment="Top" Height="14"/>
+        <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="473,107,0,0" Grid.Row="1"/>
+        <Label x:Name="save_name" Content="Name:" Height="28" HorizontalAlignment="Left" Margin="25,120,0,0" VerticalAlignment="Top" Width="148" />
+        <TextBox Height="24" HorizontalAlignment="Left" Margin="178,120,0,0" x:Name="Name" VerticalAlignment="Top" Width="119" />
+        <ListBox Name ="Save_task"  HorizontalAlignment="Left" Height="152" Margin="34,381,0,0" VerticalAlignment="Top" Width="149" MouseDoubleClick="Save_task_MouseDoubleClick" />
+
+        <Button x:Name="delete" Content="Delete" HorizontalAlignment="Left" Height="23" Margin="188,439,0,0" VerticalAlignment="Top" Width="99" Click="Delete_item"/>
+        <Button x:Name="delete_all" Content="Delete All" HorizontalAlignment="Left" Height="23" Margin="188,467,0,0" VerticalAlignment="Top" Width="99" Click="Delete_allitems"/>
+        <Button x:Name="save" Content="Save" HorizontalAlignment="Left" Height="23" Margin="188,383,0,0" VerticalAlignment="Top" Width="99" Click="Save_item"/>
+        <Button x:Name="save_all" Content="Save All" HorizontalAlignment="Left" Height="23" Margin="188,411,0,0" VerticalAlignment="Top" Width="99" Click="Saves_items"/>
+
+        <Label Name="Message" Content="" HorizontalAlignment="Left" Height="46" Margin="34,558,0,0" VerticalAlignment="Top" Width="486" FontSize="20" Visibility="Hidden"/>
+        <Label Content="" Height="28" HorizontalAlignment="Left" Margin="397,400,0,0" x:Name="name_item" VerticalAlignment="Top" Width="194" />
+        <Label Content="" Height="28" HorizontalAlignment="Left" Margin="397,433,0,0" x:Name="source_item" VerticalAlignment="Top" Width="194" />
+        <Label Content="" Height="28" HorizontalAlignment="Left" Margin="397,466,0,0" x:Name="target_item" VerticalAlignment="Top" Width="194" />
+        <Label x:Name="task_target" Content="Target path :" Height="28" HorizontalAlignment="Left" Margin="287,466,0,0" VerticalAlignment="Top" Width="105" />
+        <Label x:Name="task_source" Content="Source path :" Height="28" HorizontalAlignment="Left" Margin="287,433,0,0" VerticalAlignment="Top" Width="105" />
+        <Label x:Name="task_name" Content="Name :" Height="28" HorizontalAlignment="Left" Margin="287,400,0,0" VerticalAlignment="Top" Width="105" />
+        <Label x:Name="task_infos" Content="Task informations :" Height="28" HorizontalAlignment="Left" Margin="373,362,0,0" VerticalAlignment="Top" Width="173" RenderTransformOrigin="0.5,0.5" />
+        <Button x:Name="blacklist_software" Content="Blacklist Software" HorizontalAlignment="Left" Height="32" Margin="530,290,0,0" VerticalAlignment="Top" Width="104" Click="Open_blacklist"/>
+        <Button x:Name="encrypt_extension" Content="Add Encrypt extension" HorizontalAlignment="Left" Height="32" Margin="451,253,0,0" VerticalAlignment="Top" Width="183" Click="Open_cryptextension"/>
+        <ProgressBar Minimum="0" Maximum="100" Name="progressbartask" Margin="287,474,233,206" Height="20" Visibility="Hidden" />
+        <Button Content="..." HorizontalAlignment="Left" Height="22" Margin="473,162,0,0" VerticalAlignment="Top" Width="16" Click="Add_sourcefolder"/>
+        <Button Content="..." HorizontalAlignment="Left" Height="24" Margin="473,202,0,0" VerticalAlignment="Top" Width="16" Click="Add_targetfolder"/>
+        <Button x:Name="sw_language" Content="Switch language" HorizontalAlignment="Left" Height="32" Margin="10,573,0,0" VerticalAlignment="Top" Width="149" Click="Switch_language" Grid.Row="1"/>
+
+        <Button x:Name="priority" Content="Modify priority list" HorizontalAlignment="Left" Height="32" Margin="309,253,0,0" VerticalAlignment="Top" Width="127" Click="Open_cryptextension"/>
+
+        <Button Content="▶/||" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="21" Margin="367,558,0,0" Name="pause" Visibility="Hidden" Click="PlayPause">
+        </Button>
+        <Button Content="■" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="21" Margin="397,558,0,0" Name="stop" Visibility="Hidden" Click="Stop">
+        </Button>
+        <Button x:Name="parallele_size_file" Content="Parallele size file" HorizontalAlignment="Left" Height="32" Margin="309,290,0,0" VerticalAlignment="Top" Width="204" Click="Update_sizefile"/>
+        <TextBox Height="24" HorizontalAlignment="Left" Margin="217,295,0,0" x:Name="sizefile" VerticalAlignment="Top" Width="80" />
+
+
+    </Grid>
+</UserControl>
