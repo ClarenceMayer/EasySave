@@ -117,8 +117,6 @@ namespace EasySave.Model
             string json = JsonConvert.SerializeObject(data, Formatting.Indented);
             tsw.WriteLine(json);
             tsw.Close();
-
-
         }
         
     }

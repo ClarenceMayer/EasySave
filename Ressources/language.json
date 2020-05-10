@@ -32,7 +32,8 @@
     "full_save_diff": "Do you want to make a full save ?",
     "full_save_diff_all": "Full Save",
     "parallele_size_file": "Parallele size file",
-    "priority": "Modify priority list"
+    "priority": "Modify priority list",
+    "success_saveall": "All saves launched"
   },
   "french": {
     "save_name": "Nom :",
@@ -67,6 +68,7 @@
     "full_save_diff": "Voulez-vous faire une sauvegarde complète ?",
     "full_save_diff_all": "Sauvegarde Complète",
     "parallele_size_file": "Taille max fichier en parallèle",
-    "priority": "Modifier list prioritaire"
+    "priority": "Modifier list prioritaire",
+    "success_saveall": "Toutes les sauvegardes sont lancées"
   }
 }

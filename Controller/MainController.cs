@@ -8,6 +8,7 @@ using EasySave.View;
 using EasySave.Model;
 using System.Threading;
 using System.Windows;
+using System.Configuration;
 
 namespace EasySave.Controller
 {
@@ -440,7 +441,7 @@ namespace EasySave.Controller
             }
             else
             {
-                string val =Utils.JsonReader(View.current_targetpath + "/realtime_log_" + View.current_name + ".json", "backup_progress");
+                string val =Utils.JsonReader(ConfigurationSettings.AppSettings["LogFolder"] + "/realtime_log_" + View.current_name + ".json", "backup_progress");
                 if (val != "")
                 {
                     View.Dispatcher.BeginInvoke(new Action(() => { View.progressbartask.Value = Convert.ToInt16(val); }));

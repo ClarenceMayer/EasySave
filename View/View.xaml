@@ -41,7 +41,7 @@
         <ProgressBar Minimum="0" Maximum="100" Name="progressbartask" Margin="287,474,233,206" Height="20" Visibility="Hidden" />
         <Button Content="..." HorizontalAlignment="Left" Height="22" Margin="473,162,0,0" VerticalAlignment="Top" Width="16" Click="Add_sourcefolder"/>
         <Button Content="..." HorizontalAlignment="Left" Height="24" Margin="473,202,0,0" VerticalAlignment="Top" Width="16" Click="Add_targetfolder"/>
-        <Button x:Name="sw_language" Content="Switch language" HorizontalAlignment="Left" Height="32" Margin="10,573,0,0" VerticalAlignment="Top" Width="149" Click="Switch_language" Grid.Row="1"/>
+        <Button x:Name="sw_language" Content="Switch language" HorizontalAlignment="Left" Height="32" Margin="34,609,0,0" VerticalAlignment="Top" Width="149" Click="Switch_language"/>
 
         <Button x:Name="priority" Content="Modify priority list" HorizontalAlignment="Left" Height="32" Margin="309,253,0,0" VerticalAlignment="Top" Width="127" Click="Open_cryptextension"/>
 

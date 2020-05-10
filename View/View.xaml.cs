@@ -208,6 +208,11 @@ namespace EasySave.View
                     Message.Content = dict["businesswarerunning"]; ;
                     Message.Visibility = Visibility;
                     break;
+                case "success_saveall":
+                    Message.Foreground = Brushes.Green;
+                    Message.Content = dict["success_saveall"]; ;
+                    Message.Visibility = Visibility;
+                    break;
                 default:
                     break;
             }
