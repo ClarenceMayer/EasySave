@@ -61,9 +61,14 @@ namespace EasySave.Model
             string path = target_folder + '/' + name;
             FullSavePrio(di, path);
             FullSave(di, path);
-
-            m_realTimeMonitoring.GenerateFinalLog();
-            controller.Update_progressbar();
+            lock(m_realTimeMonitoring)
+            {
+                m_realTimeMonitoring.GenerateFinalLog();
+            }
+            lock (m_realTimeMonitoring)
+            {
+                controller.Update_progressbar();
+            }
 
             controller.KillThread(name);
             
@@ -151,8 +156,16 @@ namespace EasySave.Model
             m_daily_log.SetPaths(fi.FullName);
             m_daily_log.millisecondEarly();
 
-            m_realTimeMonitoring.GenerateLog(current_file);
-            controller.Update_progressbar();
+            lock (m_realTimeMonitoring)
+            {
+                m_realTimeMonitoring.GenerateLog(current_file);
+            }
+            lock (m_realTimeMonitoring)
+            {
+                controller.Update_progressbar();
+            }
+            
+                        
             current_file++;
             string temp_path = target_path + '/' + fi.Name;
             //check if the extension is the list to encrypt

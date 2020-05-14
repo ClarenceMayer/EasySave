@@ -68,8 +68,14 @@ namespace EasySave.Model
                 IncrementSavePrio(di, target_path, complete_path);
                 IncrementSave(di, target_path, complete_path);
             }
-            m_realTimeMonitoring.GenerateFinalLog();
-            controller.Update_progressbar();
+            lock(m_realTimeMonitoring)
+            {
+                m_realTimeMonitoring.GenerateFinalLog();
+            }
+            lock (m_realTimeMonitoring)
+            {
+                controller.Update_progressbar();
+            }
 
             controller.KillThread(name);
         }
@@ -92,8 +98,15 @@ namespace EasySave.Model
                 FullSavePrio(di, complete_path);
                 FullSave(di, complete_path);
             }
-            m_realTimeMonitoring.GenerateFinalLog();
-            controller.Update_progressbar();
+            lock (m_realTimeMonitoring)
+            {
+                m_realTimeMonitoring.GenerateFinalLog();
+            }
+            lock (m_realTimeMonitoring)
+            {
+                controller.Update_progressbar();
+            }
+            
 
             controller.KillThread(name);
         }
@@ -306,9 +319,15 @@ namespace EasySave.Model
                 m_daily_log = DailyLog.Instance;
                 m_daily_log.SetPaths(fi.FullName);
                 m_daily_log.millisecondEarly();
-
-                m_realTimeMonitoring.GenerateLog(current_file);
-                this.controller.Update_progressbar();
+                lock(m_realTimeMonitoring)
+                {
+                    m_realTimeMonitoring.GenerateLog(current_file);
+                }
+                lock (m_realTimeMonitoring)
+                {
+                    this.controller.Update_progressbar();
+                }
+                
                 current_file++;
                 string temp_path = target_path + '/' + fi.Name;
                 fiTemp.CopyTo(temp_path, true);
@@ -329,8 +348,16 @@ namespace EasySave.Model
             m_daily_log.SetPaths(fi.FullName);
             m_daily_log.millisecondEarly();
 
-            m_realTimeMonitoring.GenerateLog(current_file);
-            controller.Update_progressbar();
+            lock(m_realTimeMonitoring)
+            {
+                m_realTimeMonitoring.GenerateLog(current_file);
+            }
+            
+            lock(m_realTimeMonitoring)
+            {
+                controller.Update_progressbar();
+            }
+            
             current_file++;
             string temp_path = target_path + '/' + fi.Name;
             //check if the extension is the list to encrypt
