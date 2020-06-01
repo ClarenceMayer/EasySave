@@ -12,7 +12,6 @@ namespace EasySave.Model
         string name { get; set; }
         string source_folder { get; set; }
         string target_folder { get; set; }
-        bool priority_work_in_progress { get; set; }
         void LaunchSave();
         void LaunchSaveInc(object full_save);
     }

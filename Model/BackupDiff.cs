@@ -13,16 +13,6 @@ namespace EasySave.Model
     {
         public BackupDiff(string _name, string _source_folder, string _target_folder, IMainController c)
         {
-            //check if source directory exist if it is not an extern storage
-            if (_source_folder[0] != '\\'){
-                DirectoryInfo diSource = new DirectoryInfo(_source_folder);
-                if (!diSource.Exists)
-                {
-                    MessageBox.Show("source folder was not found");
-                    Process.GetCurrentProcess().Kill();
-                }
-            }
-
             name = _name;
             source_folder = _source_folder;
             target_folder = _target_folder;
@@ -41,82 +31,93 @@ namespace EasySave.Model
         private string m_source_folder;
         private string m_target_folder;
         private bool m_first_save;
-        private bool m_priority_work_in_progress = false;
 
         public string name { get => m_name; set => m_name = value; }
         public string source_folder { get => m_source_folder; set => m_source_folder = value; }
         public string target_folder { get => m_target_folder; set => m_target_folder = value; }
         public bool first_save { get => m_first_save; set => m_first_save = value; }
-        public bool priority_work_in_progress { get => m_priority_work_in_progress; set => m_priority_work_in_progress = value; }
 
 
         //launch save, check if it is the first save, if it is do a full save, else do an incremental save
         public void LaunchSave()
         {
-            current_file = 0;
-            DirectoryInfo di = new DirectoryInfo(m_source_folder);
-            if (first_save)
+            try
             {
-                string target_path = target_folder + '/' + name + "/completeBackup/";
-                first_save = false;
-                FullSavePrio(di, target_path);
-                FullSave(di, target_path);
-            }
-            else
-            {
-                string complete_path = target_folder + '/' + name + "/completeBackup/";
-                string target_path = target_folder + '/' + name + "/tempBackup/";
+                current_file = 0;
+                DirectoryInfo di = new DirectoryInfo(m_source_folder);
+                if (first_save)
+                {
+                    string target_path = target_folder + '/' + name + "/completeBackup/";
+                    first_save = false;
+                    FullSavePrio(di, target_path);
+                    FullSave(di, target_path);
+                }
+                else
+                {
+                    string complete_path = target_folder + '/' + name + "/completeBackup/";
+                    string target_path = target_folder + '/' + name + "/tempBackup/";
 
-                IncrementSavePrio(di, target_path, complete_path);
-                IncrementSave(di, target_path, complete_path);
-            }
-            lock(m_realTimeMonitoring)
-            {
-                m_realTimeMonitoring.GenerateFinalLog();
-            }
-            lock (m_realTimeMonitoring)
-            {
-                controller.Update_progressbar();
-            }
+                    IncrementSavePrio(di, target_path, complete_path);
+                    IncrementSave(di, target_path, complete_path);
+                }
+                lock (m_realTimeMonitoring)
+                {
+                    m_realTimeMonitoring.GenerateFinalLog();
+                }
+                lock (m_realTimeMonitoring)
+                {
+                    controller.Update_progressbar();
+                }
 
-            controller.KillThread(name);
+                controller.KillThread(name);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
         //launch save, user choose if it is a full or incremental save, if it is the first save he can't force incremental save
         public void LaunchSaveInc(object full_save)
         {
-            current_file = 0;
-            DirectoryInfo di = new DirectoryInfo(m_source_folder);
-            if (!(bool)full_save && !first_save)
+            try
             {
-                string complete_path = target_folder + '/' + name + "/completeBackup/";
-                string target_path = target_folder + '/' + name + "/tempBackup/";
-                IncrementSavePrio(di, target_path, complete_path);
-                IncrementSave(di, target_path, complete_path);
-            }
-            else
-            {
-                string complete_path = target_folder + '/' + name + "/completeBackup/";
-                first_save = false;
-                FullSavePrio(di, complete_path);
-                FullSave(di, complete_path);
-            }
-            lock (m_realTimeMonitoring)
-            {
-                m_realTimeMonitoring.GenerateFinalLog();
-            }
-            lock (m_realTimeMonitoring)
-            {
-                controller.Update_progressbar();
-            }
-            
+                current_file = 0;
+                DirectoryInfo di = new DirectoryInfo(m_source_folder);
+                if (!(bool)full_save && !first_save)
+                {
+                    string complete_path = target_folder + '/' + name + "/completeBackup/";
+                    string target_path = target_folder + '/' + name + "/tempBackup/";
+                    IncrementSavePrio(di, target_path, complete_path);
+                    IncrementSave(di, target_path, complete_path);
+                }
+                else
+                {
+                    string complete_path = target_folder + '/' + name + "/completeBackup/";
+                    first_save = false;
+                    FullSavePrio(di, complete_path);
+                    FullSave(di, complete_path);
+                }
+                lock (m_realTimeMonitoring)
+                {
+                    m_realTimeMonitoring.GenerateFinalLog();
+                }
+                lock (m_realTimeMonitoring)
+                {
+                    controller.Update_progressbar();
+                }
 
-            controller.KillThread(name);
+
+                controller.KillThread(name);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         //Mirror save
         public void FullSave(DirectoryInfo di, string target_path)
         {
-            priority_work_in_progress = false;
             DirectoryInfo diTarget = new DirectoryInfo(target_path);
             if (!diTarget.Exists)
             {
@@ -128,7 +129,7 @@ namespace EasySave.Model
                 if (Utils.checkBusinessSoft(controller.blacklisted_apps))
                 {
                     MessageBox.Show("A business software has been detected, task will be canceled !");
-                    Thread.CurrentThread.Abort();
+                    controller.KillThread(name);
                 }
                 if (!Utils.IsPriority(fi.Extension))
                 {
@@ -154,7 +155,6 @@ namespace EasySave.Model
 
         public void FullSavePrio(DirectoryInfo di, string target_path)
         {
-            priority_work_in_progress = true;
             DirectoryInfo diTarget = new DirectoryInfo(target_path);
             if (!diTarget.Exists)
             {
@@ -166,7 +166,7 @@ namespace EasySave.Model
                 if (Utils.checkBusinessSoft(controller.blacklisted_apps))
                 {
                     MessageBox.Show("A business software has been detected, task will be canceled !");
-                    Thread.CurrentThread.Abort();
+                    controller.KillThread(name);
                 }
                 if (Utils.IsPriority(fi.Extension))
                 {
@@ -193,7 +193,6 @@ namespace EasySave.Model
         //IncrementalSave
         public void IncrementSave(DirectoryInfo di, string target_path, string complete_path)
         {
-            priority_work_in_progress = false;
             DirectoryInfo diTarget = new DirectoryInfo(target_path);
             if (!diTarget.Exists)
             {
@@ -207,7 +206,7 @@ namespace EasySave.Model
                 if (Utils.checkBusinessSoft(controller.blacklisted_apps))
                 {
                     MessageBox.Show("A business software has been detected, task will be canceled !");
-                    Thread.CurrentThread.Abort();
+                    controller.KillThread(name);
                 }
                 if (!Utils.IsPriority(fi.Extension))
                 {
@@ -235,7 +234,6 @@ namespace EasySave.Model
 
         public void IncrementSavePrio(DirectoryInfo di, string target_path, string complete_path)
         {
-            priority_work_in_progress = true;
             DirectoryInfo diTarget = new DirectoryInfo(target_path);
             if (!diTarget.Exists)
             {
@@ -249,7 +247,7 @@ namespace EasySave.Model
                 if (Utils.checkBusinessSoft(controller.blacklisted_apps))
                 {
                     MessageBox.Show("A business software has been detected, task will be canceled !");
-                    Thread.CurrentThread.Abort();
+                    controller.KillThread(name);
                 }
                 if (Utils.IsPriority(fi.Extension))
                 {

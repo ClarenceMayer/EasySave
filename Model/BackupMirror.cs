@@ -1,15 +1,9 @@
 ﻿using EasySave.Controller;
-using EasySave.Controller;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Windows;
-using System.Diagnostics;
 
 namespace EasySave.Model
 {
@@ -17,23 +11,12 @@ namespace EasySave.Model
     {
         public BackupMirror(string _name, string _source_folder, string _target_folder, IMainController c)
         {
-            //check if source directory exist 
-            if (_source_folder[0] != '\\')
-            {
-                DirectoryInfo diSource = new DirectoryInfo(_source_folder);
-                if (!diSource.Exists)
-                {
-                    MessageBox.Show("source folder was not found");
-                    Process.GetCurrentProcess().Kill();
-                }
-            }
-
-            name = _name;
-            source_folder = _source_folder;
-            target_folder = _target_folder;
-            m_realTimeMonitoring = new RealTimeMonitoring(name);
-            m_realTimeMonitoring.SetPaths(source_folder);
-            controller = c;
+                name = _name;
+                source_folder = _source_folder;
+                target_folder = _target_folder;
+                m_realTimeMonitoring = new RealTimeMonitoring(name);
+                m_realTimeMonitoring.SetPaths(source_folder);
+                controller = c;
         }
 
         private RealTimeMonitoring m_realTimeMonitoring;
@@ -44,39 +27,40 @@ namespace EasySave.Model
         private string m_name;
         private string m_source_folder;
         private string m_target_folder;
-        private bool m_priority_work_in_progress = false;
 
         public string name { get => m_name; set => m_name = value; }
         public string source_folder { get => m_source_folder; set => m_source_folder = value; }
         public string target_folder { get => m_target_folder; set => m_target_folder = value; }
-        public bool priority_work_in_progress { get => m_priority_work_in_progress; set => m_priority_work_in_progress = value; }
 
         //Launching save, setting directory to copy and create save path
         public void LaunchSave()
         {
-           
-            current_file = 0;
-            DirectoryInfo di = new DirectoryInfo(m_source_folder);
-            string path = target_folder + '/' + name;
-            FullSavePrio(di, path);
-            FullSave(di, path);
-            lock(m_realTimeMonitoring)
+            try
             {
-                m_realTimeMonitoring.GenerateFinalLog();
-            }
-            lock (m_realTimeMonitoring)
-            {
-                controller.Update_progressbar();
-            }
+                current_file = 0;
+                DirectoryInfo di = new DirectoryInfo(m_source_folder);
+                string path = target_folder + '/' + name;
+                FullSavePrio(di, path);
+                FullSave(di, path);
+                lock (m_realTimeMonitoring)
+                {
+                    m_realTimeMonitoring.GenerateFinalLog();
+                }
+                lock (m_realTimeMonitoring)
+                {
+                    controller.Update_progressbar();
+                }
 
-            controller.KillThread(name);
-            
+                controller.KillThread(name);
+            }catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         //Mirror save
         public void FullSave(DirectoryInfo di, string target_path)
         {
-            priority_work_in_progress = false;
             //check if target directory exist, in case he doesn't create the directory
             DirectoryInfo diTarget = new DirectoryInfo(target_path);
             if (!diTarget.Exists)
@@ -90,7 +74,7 @@ namespace EasySave.Model
                 if (Utils.checkBusinessSoft(controller.blacklisted_apps))
                 {
                     MessageBox.Show("A business software has been detected, task will be canceled !");
-                    Thread.CurrentThread.Abort();
+                    controller.KillThread(name);
                 }
                 if (!Utils.IsPriority(fi.Extension))
                 {
@@ -118,7 +102,6 @@ namespace EasySave.Model
 
         private void FullSavePrio(DirectoryInfo di, string target_path)
         {
-            priority_work_in_progress = true;
             //check if target directory exist, in case he doesn't create the directory
             DirectoryInfo diTarget = new DirectoryInfo(target_path);
             if (!diTarget.Exists)
@@ -132,7 +115,7 @@ namespace EasySave.Model
                 if (Utils.checkBusinessSoft(controller.blacklisted_apps))
                 {
                     MessageBox.Show("A business software has been detected, task will be canceled !");
-                    Thread.CurrentThread.Abort();
+                    controller.KillThread(name);
                 }
                 if (Utils.IsPriority(fi.Extension))
                 {
@@ -160,7 +143,6 @@ namespace EasySave.Model
 
         private void Save(FileInfo fi, string target_path)
         {
-            
             m_daily_log = DailyLog.Instance;
             m_daily_log.SetPaths(fi.FullName);
             m_daily_log.millisecondEarly();

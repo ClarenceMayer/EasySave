@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using EasySave.View;
 using EasySave.Model;
@@ -12,7 +11,6 @@ using System.Configuration;
 using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Schema;
 using System.Windows.Forms;
 
 namespace EasySave.Controller
@@ -64,7 +62,7 @@ namespace EasySave.Controller
                 System.Windows.Application.Current.Shutdown();
             }
 
-            this.SetupErrorHandling();
+           this.SetupErrorHandling();
 
             DistantConsoleServer server = new DistantConsoleServer(this);
             Thread ServerThread = new Thread(server.RunServer);
@@ -259,8 +257,16 @@ namespace EasySave.Controller
                     break;
             }
         }
+        //method called to add a save to task list
         public string Add_save(string name, string source_folder, string target_folder, string backuptype)
         {
+            for (int i = 0; i < backup.Count; i++)
+            {
+                if (name == backup[i].name)
+                {
+                    return "error_name_exist";
+                }
+            }
             if (name == "")
             {
                 return "error_name";
@@ -275,6 +281,10 @@ namespace EasySave.Controller
             {
                 return "error_backuptype";
             }
+            else if (!Directory.Exists(source_folder))
+            {
+                return "error_source_notfound";
+            }
             else if (backuptype == "diff")
             {
                 backup.Add(new BackupDiff(name, source_folder, target_folder, this) { name = name, source_folder = source_folder, target_folder = target_folder });
@@ -286,12 +296,10 @@ namespace EasySave.Controller
                 backup.Add(new BackupMirror(name, source_folder, target_folder, this) { name = name, source_folder = source_folder, target_folder = target_folder });
                 return "success_backupmirr";
             }
-            else
-            {
-                return null;
-            }
-
+            return null;
         }
+
+        //method called to remove a specific save from task list
         public string Remove_task(int indextask)
         {
             for (int i = 0; i < backup.Count; i++)
@@ -329,6 +337,7 @@ namespace EasySave.Controller
             return "success_delete";
         }
 
+        //method called to remove all save from task list
         public string Remove_alltasks()
         {
             if (backup.Count != 0) {
@@ -353,6 +362,7 @@ namespace EasySave.Controller
                             }
                             th.Abort();
                         }
+                        backup.Clear();
                         return "success_deleteall";
                     }
                 }
@@ -360,6 +370,7 @@ namespace EasySave.Controller
             return null;
         }
 
+        //launch all save task
         public string Save_alltasks()
         {
             int count = 0;
@@ -417,6 +428,8 @@ namespace EasySave.Controller
             }
             return null;
         }
+
+        //launch a save for a specific task 
         public string Save_task(int indextask)
         {
             foreach (IBackup task in backup)
@@ -444,6 +457,8 @@ namespace EasySave.Controller
             return null;
 
         }
+
+
         public string Save_diff(bool fulldiff, int indextask)
         {
             foreach (IBackup task in backup)
@@ -479,35 +494,37 @@ namespace EasySave.Controller
             }
             return null;
         }
-        public bool IsAPriorityTaskRunning()
-        {
-            bool ret = false;
-            foreach (IBackup backup in backup)
-            {
-                if (backup.priority_work_in_progress)
-                {
-                    ret = true;
-                }
-            }
-            return ret;
-        }
+
+
+          //refresh progress bar
         public void Update_progressbar()
         {
-            if (View.current_name == null && View.current_targetpath == null)
+            if(View.current_name != null)
             {
-            }
-            else
-            {
-                string val = Utils.JsonReader(ConfigurationSettings.AppSettings["LogFolder"] + "/realtime_log_" + View.current_name + ".json", "backup_progress");
-
-                if (val != "")
+                try
                 {
-                    View.Dispatcher.BeginInvoke(new Action(() => { View.progressbartask.Value = Convert.ToInt16(val); }));
+                    string val = Utils.JsonReader(ConfigurationSettings.AppSettings["LogFolder"] + "/realtime_log_" + View.current_name + ".json", "backup_progress");
+                    if (val != "")
+                    {
+                        View.Dispatcher.BeginInvoke(new Action(() => { View.Update_Progress(val); }));
+                        View.Dispatcher.BeginInvoke(new Action(() => { View.progressbartask.Value = Convert.ToInt16(val); }));
+                    }
+                    else
+                    {
+                        View.Dispatcher.BeginInvoke(new Action(() => { View.Update_Progress("0"); }));
+                        View.Dispatcher.BeginInvoke(new Action(() => { View.progressbartask.Value = Convert.ToInt16("0"); }));
+                    }
+                    View.Refresh();
                 }
-                View.Refresh();
+                catch(Exception ex)
+                {
+                    System.Windows.MessageBox.Show(ex.ToString());
+                }
             }
         }
 
+
+        //play/pause switch function
         public void Play_Pause(string name)
         {
             for (int i = 0; i < threads_list.Count; i++)
@@ -527,6 +544,7 @@ namespace EasySave.Controller
             }
         }
 
+        //cancel a task
         public void Stop(string name)
         {
             for (int i = 0; i < threads_list.Count; i++)
@@ -550,6 +568,7 @@ namespace EasySave.Controller
             }
         }
 
+        //abort a specific thread and update thread list
         public void KillThread(string name)
         {
             for (int i = 0; i < threads_list.Count; i++)

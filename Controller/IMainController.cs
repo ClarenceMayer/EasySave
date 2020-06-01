@@ -27,7 +27,6 @@ namespace EasySave.Controller
         string Informations_items(int index);
         Dictionary<string, Dictionary<string, string>> getLanguageDict();
         void Close();
-        bool IsAPriorityTaskRunning();
         void Update_progressbar();
         void Play_Pause(string name);
         void Stop(string name);

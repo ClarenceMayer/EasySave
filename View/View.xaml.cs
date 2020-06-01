@@ -103,11 +103,7 @@ namespace EasySave.View
             if (mirr_check)
             {
                 string response = controller.Add_save(Name.Text, sourcefolder.Text, targetfolder.Text, "mirr");
-                if (response == "error_name" | response == "error_source" | response == "error_target" | response == "error_backuptype")
-                {
-
-                }
-                else
+                if (response == "success_backupmirr")
                 {
                     Save_task.Items.Add(controller.Last_backup().name);
                 }
@@ -116,11 +112,7 @@ namespace EasySave.View
             else if (diff_check)
             {
                 string response = controller.Add_save(Name.Text, sourcefolder.Text, targetfolder.Text, "diff");
-                if (response == "error_name" | response == "error_source" | response == "error_target" | response == "error_backuptype")
-                {
-
-                }
-                else
+                if (response == "success_backupdiff")
                 {
                     Save_task.Items.Add(controller.Last_backup().name);
                 }
@@ -249,6 +241,16 @@ namespace EasySave.View
                     Message.Content = dict["success_saveall"]; ;
                     Message.Visibility = Visibility;
                     break;
+                case "error_name_exist":
+                    Message.Foreground = Brushes.Red;
+                    Message.Content = "this task name is already taken" ;
+                    Message.Visibility = Visibility;
+                    break;
+                case "error_source_notfound":
+                    Message.Foreground = Brushes.Red;
+                    Message.Content = "Source folder wasn't found";
+                    Message.Visibility = Visibility;
+                    break;
                 default:
                     break;
             }
@@ -283,6 +285,7 @@ namespace EasySave.View
                 
                 current_name = item[0];
                 current_targetpath = item[2];
+                controller.Update_progressbar();
                 progressbartask.Visibility = Visibility.Visible;
                 pause.Visibility = Visibility.Visible;
                 stop.Visibility = Visibility.Visible;
@@ -376,6 +379,10 @@ namespace EasySave.View
             controller.Update_sizefile(sizefile.Text);
         }
 
+        public void Update_Progress(string val)
+        {
+            progressValue.Content = val + '%';
+        }
 
     }
 }
