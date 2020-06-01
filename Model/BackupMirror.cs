@@ -50,12 +50,16 @@ namespace EasySave.Model
                 {
                     controller.Update_progressbar();
                 }
-
-                controller.KillThread(name);
-            }catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
             }
+            catch (Exception ex)
+            {
+                if (!ex.ToString().Contains("System.Threading.ThreadAbortException"))
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+            controller.KillThread(name);
+           
         }
 
         //Mirror save

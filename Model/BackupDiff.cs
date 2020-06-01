@@ -68,13 +68,15 @@ namespace EasySave.Model
                 {
                     controller.Update_progressbar();
                 }
-
-                controller.KillThread(name);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                if (!ex.ToString().Contains("System.Threading.ThreadAbortException"))
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
+            controller.KillThread(name);
         }
         //launch save, user choose if it is a full or incremental save, if it is the first save he can't force incremental save
         public void LaunchSaveInc(object full_save)
@@ -105,14 +107,15 @@ namespace EasySave.Model
                 {
                     controller.Update_progressbar();
                 }
-
-
-                controller.KillThread(name);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                if (!ex.ToString().Contains("System.Threading.ThreadAbortException"))
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
+            controller.KillThread(name);
         }
 
         //Mirror save
