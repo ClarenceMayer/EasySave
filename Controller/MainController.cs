@@ -572,6 +572,19 @@ namespace EasySave.Controller
             }
         }
 
+        public void Update_sizefile(string input)
+        {
+            
+
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings.Remove("MaxSizeFile");
+            config.AppSettings.Settings.Add("MaxSizeFile", input);
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+
+            checkSizeFileFormat();
+        }
+
 
         //check if there no error when the application is launched
         private void SetupErrorHandling()
@@ -627,7 +640,6 @@ namespace EasySave.Controller
             if (rx.IsMatch(ConfigurationSettings.AppSettings["MaxSizeFile"]))
             {
                 System.Windows.MessageBox.Show("max file size must be a positive number");
-                Process.GetCurrentProcess().Kill();
             }
         }
     }

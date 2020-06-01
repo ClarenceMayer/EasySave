@@ -373,11 +373,7 @@ namespace EasySave.View
         }
         private void Update_sizefile(object sender, RoutedEventArgs e)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings.Remove("MaxSizeFile");
-            config.AppSettings.Settings.Add("MaxSizeFile", sizefile.Text);
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+            controller.Update_sizefile(sizefile.Text);
         }
 
 

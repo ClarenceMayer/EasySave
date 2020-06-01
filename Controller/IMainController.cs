@@ -32,5 +32,6 @@ namespace EasySave.Controller
         void Play_Pause(string name);
         void Stop(string name);
         void KillThread(string name);
+        void Update_sizefile(string input);
     }
 }
