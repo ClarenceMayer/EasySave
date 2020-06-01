@@ -1,16 +1,10 @@
-﻿using Microsoft.Win32;
-using System;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using EasySave.Controller;
 using System.Collections.Generic;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using Newtonsoft.Json.Linq;
 using System.Configuration;
-using EasySave.Model;
-using System.Windows.Threading;
+using System;
 
 namespace EasySave.View
 {
@@ -26,8 +20,6 @@ namespace EasySave.View
         Dictionary<string, Dictionary<string, string>> language_dict;
         Dictionary<string, string> dict;
 
-        
-
         public View(IMainController c)
         {
             controller = c;
@@ -39,6 +31,44 @@ namespace EasySave.View
             language_dict = controller.getLanguageDict();
             dict = language_dict["english"];
             language = "en";
+            this.Loaded += UserControl1_Loaded;
+        }
+        void UserControl1_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window window = Window.GetWindow(this);
+            window.Closing += window_Closing;
+        }
+        void window_Closing(object sender, global::System.ComponentModel.CancelEventArgs e)
+        {
+            string current_thread = "";
+            foreach (var th in controller.threads_list)
+            {
+                if (th.IsAlive)
+                {
+                    current_thread = current_thread + " " + th.Name;
+                }
+            }
+            if (current_thread != "")
+            {
+                MessageBoxResult result = MessageBox.Show("this/these task(s) are still in progress:" + current_thread + " ,do you want to close the application?", " close", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+                if (result == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+                else if (result == MessageBoxResult.Yes)
+                {
+                    foreach (var th in controller.threads_list)
+                    {
+                        th.Abort();
+                    }
+                    controller.Close();
+                }
+            }
+            else
+            {
+                controller.Close();
+            }
+
         }
 
         private void Add_sourcefolder(object sender, RoutedEventArgs e)
@@ -107,18 +137,24 @@ namespace EasySave.View
             if (Save_task.SelectedItem != null)
             {
                 string response = controller.Remove_task(Save_task.SelectedIndex);
-                Save_task.Items.RemoveAt(Save_task.Items.IndexOf(Save_task.SelectedItem));
+                if (response == "success_delete")
+                {
+                    Save_task.Items.RemoveAt(Save_task.Items.IndexOf(Save_task.SelectedItem));
+                }
                 Display_error_success(response);
             }
         }
         private void Delete_allitems(object sender, RoutedEventArgs e)
         {
             string response = controller.Remove_alltasks();
-            while(Save_task.Items.Count > 0)
+            if (response == "success_deleteall")
             {
-                Save_task.Items.RemoveAt(0);
+                while (Save_task.Items.Count > 0)
+                {
+                    Save_task.Items.RemoveAt(0);
+                }
+                Display_error_success(response);
             }
-            Display_error_success(response);
         }
         
         private void Save_item(object sender, RoutedEventArgs e)

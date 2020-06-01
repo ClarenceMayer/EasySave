@@ -1,6 +1,7 @@
 ﻿using EasySave.Controller;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -111,7 +112,7 @@ namespace EasySave.Model
             foreach(IBackup backup in controller.backup)
             {
                 if (name.Contains(backup.name)){
-                    string progressBar = Utils.JsonReader(backup.target_folder + "/realtime_log_"+backup.name+".json", "backup_progress");
+                    string progressBar = Utils.JsonReader(ConfigurationSettings.AppSettings["LogFolder"] + "/realtime_log_"+backup.name+".json", "backup_progress");
 
                     ret = backup.name + "," + backup.source_folder + "," + backup.target_folder + "," + progressBar;
                 }

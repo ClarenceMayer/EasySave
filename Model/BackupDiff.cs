@@ -1,7 +1,10 @@
 ﻿using EasySave.Controller;
 using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Windows;
 
 namespace EasySave.Model
 {
@@ -15,7 +18,8 @@ namespace EasySave.Model
                 DirectoryInfo diSource = new DirectoryInfo(_source_folder);
                 if (!diSource.Exists)
                 {
-                    Console.WriteLine("Source file not found");
+                    MessageBox.Show("source folder was not found");
+                    Process.GetCurrentProcess().Kill();
                 }
             }
 
@@ -38,13 +42,11 @@ namespace EasySave.Model
         private string m_target_folder;
         private bool m_first_save;
         private bool m_priority_work_in_progress = false;
-        private bool m_is_on_break = false;
 
         public string name { get => m_name; set => m_name = value; }
         public string source_folder { get => m_source_folder; set => m_source_folder = value; }
         public string target_folder { get => m_target_folder; set => m_target_folder = value; }
         public bool first_save { get => m_first_save; set => m_first_save = value; }
-        public bool is_on_break { get => m_is_on_break; set => m_is_on_break = value; }
         public bool priority_work_in_progress { get => m_priority_work_in_progress; set => m_priority_work_in_progress = value; }
 
 
@@ -122,7 +124,12 @@ namespace EasySave.Model
             }
             foreach (FileInfo fi in di.GetFiles())
             {
-                while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps) || controller.IsAPriorityTaskRunning()) { }
+                //while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps) || controller.IsAPriorityTaskRunning()) { }
+                if (Utils.checkBusinessSoft(controller.blacklisted_apps))
+                {
+                    MessageBox.Show("A business software has been detected, task will be canceled !");
+                    Thread.CurrentThread.Abort();
+                }
                 if (!Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
@@ -155,7 +162,12 @@ namespace EasySave.Model
             }
             foreach (FileInfo fi in di.GetFiles())
             {
-                while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps)) { }
+                //while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps)) { }
+                if (Utils.checkBusinessSoft(controller.blacklisted_apps))
+                {
+                    MessageBox.Show("A business software has been detected, task will be canceled !");
+                    Thread.CurrentThread.Abort();
+                }
                 if (Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
@@ -191,11 +203,12 @@ namespace EasySave.Model
             DirectoryInfo dirComplete = new DirectoryInfo(complete_path);
             foreach (FileInfo fi in di.GetFiles())
             {
+                //while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps) || controller.IsAPriorityTaskRunning()) { }
                 if (Utils.checkBusinessSoft(controller.blacklisted_apps))
                 {
-                    is_on_break = true;
+                    MessageBox.Show("A business software has been detected, task will be canceled !");
+                    Thread.CurrentThread.Abort();
                 }
-                while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps) || controller.IsAPriorityTaskRunning()) { }
                 if (!Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){
@@ -232,7 +245,12 @@ namespace EasySave.Model
             DirectoryInfo dirComplete = new DirectoryInfo(complete_path);
             foreach (FileInfo fi in di.GetFiles())
             {
-                while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps)) { }
+                //while (is_on_break || Utils.checkBusinessSoft(controller.blacklisted_apps)) { }
+                if (Utils.checkBusinessSoft(controller.blacklisted_apps))
+                {
+                    MessageBox.Show("A business software has been detected, task will be canceled !");
+                    Thread.CurrentThread.Abort();
+                }
                 if (Utils.IsPriority(fi.Extension))
                 {
                     if (fi.Length > Convert.ToInt16(ConfigurationSettings.AppSettings["MaxSizeFile"])){

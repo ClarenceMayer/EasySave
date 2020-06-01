@@ -9,6 +9,11 @@ using EasySave.Model;
 using System.Threading;
 using System.Windows;
 using System.Configuration;
+using System.IO;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json.Schema;
+using System.Windows.Forms;
 
 namespace EasySave.Controller
 {
@@ -29,7 +34,7 @@ namespace EasySave.Controller
         public List<IBackup> backup { get => m_backup; set => m_backup = value; }
         public View.View View { get; set; }
         public string[] blacklisted_apps { get => m_blacklisted_apps; set => m_blacklisted_apps = value; }
-        private List<Thread> threads_list { get => m_threads_list; set => m_threads_list = value; }
+        public List<Thread> threads_list { get => m_threads_list; set => m_threads_list = value; }
 
         public MainController()
         {
@@ -53,11 +58,14 @@ namespace EasySave.Controller
             bool createdNew;
             _mutex = new Mutex(true, appName, out createdNew);
 
+            //if an instance of EasySave, deny any new instance of EasySave
             if (!createdNew)
             {
-                Application.Current.Shutdown();
+                System.Windows.Application.Current.Shutdown();
             }
-            
+
+            this.SetupErrorHandling();
+
             DistantConsoleServer server = new DistantConsoleServer(this);
             Thread ServerThread = new Thread(server.RunServer);
             ServerThread.Start();
@@ -76,7 +84,7 @@ namespace EasySave.Controller
 
         public void Close()
         {
-            frameThread.Abort();
+            Process.GetCurrentProcess().Kill();
         }
 
         //method that process data in consoleMode
@@ -290,19 +298,68 @@ namespace EasySave.Controller
             {
                 if (backup.IndexOf(backup[i]) == indextask)
                 {
+                    for (int y = 0; y < threads_list.Count; y++)
+                    {
+                        if (backup[i].name == threads_list[y].Name)
+                        {
+
+                            var result = System.Windows.Forms.MessageBox.Show("a task is already in progress, would you like to continue?", "Task in progress",
+                                 MessageBoxButtons.YesNo,
+                                 MessageBoxIcon.Question);
+                            if (result == DialogResult.Yes)
+                            {
+                                if(threads_list[y].ThreadState == System.Threading.ThreadState.Suspended)
+                                {
+                                    threads_list[y].Resume();
+                                }
+                                threads_list[y].Abort();
+                                threads_list.Remove(threads_list[y]);
+                                backup.Remove(backup[i]);
+                                return "success_delete";
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                    }
                     backup.Remove(backup[i]);
                 }
             }
             return "success_delete";
         }
+
         public string Remove_alltasks()
         {
             if (backup.Count != 0) {
-                backup.Clear();
-                return "success_deleteall";
+                string current_thread = "";
+                foreach (var th in this.threads_list)
+                {
+                    if (th.IsAlive)
+                    {
+                        current_thread = current_thread + " " + th.Name;
+                    }
+                }
+                if (current_thread != "")
+                {
+                    MessageBoxResult result = System.Windows.MessageBox.Show("this/these task(s) are still in progress:" + current_thread + " ,do you want to stop them?", " close", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        foreach (var th in this.threads_list)
+                        {
+                            if (th.ThreadState == System.Threading.ThreadState.Suspended)
+                            {
+                                th.Resume();
+                            }
+                            th.Abort();
+                        }
+                        return "success_deleteall";
+                    }
+                }
             }
             return null;
         }
+
         public string Save_alltasks()
         {
             int count = 0;
@@ -450,20 +507,22 @@ namespace EasySave.Controller
                 View.Refresh();
             }
         }
+
         public void Play_Pause(string name)
         {
-            foreach(IBackup backup in backup)
+            for (int i = 0; i < threads_list.Count; i++)
             {
-                if(backup.name == name)
+                if(threads_list[i].Name == name)
                 {
-                    if (backup.is_on_break)
+                    if(threads_list[i].ThreadState == System.Threading.ThreadState.Suspended)
                     {
-                        backup.is_on_break = false;
+                        threads_list[i].Resume();
                     }
                     else
                     {
-                        backup.is_on_break = true;
-                    }       
+                        threads_list[i].Suspend();
+                    }
+                    
                 }
             }
         }
@@ -476,6 +535,10 @@ namespace EasySave.Controller
                 {
                     if (threads_list[i].Name == name)
                     {
+                        if (threads_list[i].ThreadState == System.Threading.ThreadState.Suspended)
+                        {
+                            threads_list[i].Resume();
+                        }
                         threads_list[i].Abort();
                         threads_list.Remove(threads_list[i]);
                         View.progressbartask.Value = 0;
@@ -495,9 +558,12 @@ namespace EasySave.Controller
                 {
                     if (threads_list[i].Name == name)
                     {
+                        if (threads_list[i].ThreadState == System.Threading.ThreadState.Suspended)
+                        {
+                            threads_list[i].Resume();
+                        }
                         threads_list[i].Abort();
                         threads_list.Remove(threads_list[i]);
-                        
                     }
                 }
                 catch
@@ -505,6 +571,64 @@ namespace EasySave.Controller
                 }
             }
         }
-       
+
+
+        //check if there no error when the application is launched
+        private void SetupErrorHandling()
+        {
+            //Error handling, block application if cryptosoft's path is invalid
+            if (!File.Exists(ConfigurationSettings.AppSettings["CryptoSoftPath"]))
+            {
+                System.Windows.MessageBox.Show("CryptoSoft's path isn't valid");
+                Process.GetCurrentProcess().Kill();
+            }
+
+            //Error handling, block application if software blacklist's path is invalid
+            if (!File.Exists(ConfigurationSettings.AppSettings["softwareBlacklist"]))
+            {
+                System.Windows.MessageBox.Show("software Blacklist list's path isn't valid");
+                Process.GetCurrentProcess().Kill();
+            }
+
+            //Error handling, block application if extension to crypt list's path is invalid
+            if (!File.Exists(ConfigurationSettings.AppSettings["ExtensionList"]))
+            {
+                System.Windows.MessageBox.Show("Extension crypt list's path isn't valid");
+                Process.GetCurrentProcess().Kill();
+            }
+
+            //Error handling, block application if extension to priority extension's path is invalid
+            if (!File.Exists(ConfigurationSettings.AppSettings["PriorityList"]))
+            {
+                System.Windows.MessageBox.Show("priotary extension list's path isn't valid");
+                Process.GetCurrentProcess().Kill();
+            }
+
+            //Error handling, block application if extension to dictionary's path is invalid
+            if (!File.Exists(ConfigurationSettings.AppSettings["LanguageDict"]))
+            {
+                System.Windows.MessageBox.Show("dictionary's path isn't valid");
+                Process.GetCurrentProcess().Kill();
+            }
+
+            checkFileFormat();
+        }
+
+        //check if all file format are correct
+        private void checkFileFormat()
+        {
+            checkSizeFileFormat();
+        }       
+
+        //Error handling, block application if max size file is not a positive number
+        private void checkSizeFileFormat()
+        {
+            Regex rx = new Regex("[^0-9]");
+            if (rx.IsMatch(ConfigurationSettings.AppSettings["MaxSizeFile"]))
+            {
+                System.Windows.MessageBox.Show("max file size must be a positive number");
+                Process.GetCurrentProcess().Kill();
+            }
+        }
     }
 }
