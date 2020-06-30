@@ -43,7 +43,7 @@
         <Button Content="..." HorizontalAlignment="Left" Height="24" Margin="473,202,0,0" VerticalAlignment="Top" Width="16" Click="Add_targetfolder"/>
         <Button x:Name="sw_language" Content="Switch language" HorizontalAlignment="Left" Height="32" Margin="34,609,0,0" VerticalAlignment="Top" Width="149" Click="Switch_language"/>
 
-        <Button x:Name="priority" Content="Modify priority list" HorizontalAlignment="Left" Height="32" Margin="309,253,0,0" VerticalAlignment="Top" Width="127" Click="Open_cryptextension"/>
+        <Button x:Name="priority" Content="Modify priority list" HorizontalAlignment="Left" Height="32" Margin="309,253,0,0" VerticalAlignment="Top" Width="127" Click="Open_prioritylist"/>
 
         <Button Content="▶/||" HorizontalAlignment="Left" VerticalAlignment="Top" Width="25" Height="21" Margin="367,558,0,0" Name="pause" Visibility="Hidden" Click="PlayPause">
         </Button>

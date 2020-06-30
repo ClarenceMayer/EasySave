@@ -312,6 +312,16 @@ namespace EasySave.View
             File.WriteAllText("..\\..\\Model\\software_blacklist.json", output);*/
         }
 
+        private void Open_prioritylist(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("notepad.exe", ConfigurationSettings.AppSettings["PriorityList"]);
+            /*string json = File.ReadAllText("..\\..\\Model\\software_blacklist.json");
+            dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            jsonObj[0]["blacklisted_items"] = Blacklist_name.Text;
+            string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText("..\\..\\Model\\software_blacklist.json", output);*/
+        }
+
         public void Refresh()
         {
             this.progressbartask.Refresh();
